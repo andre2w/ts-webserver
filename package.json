@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npx jest",
     "test-watch": "npx jest --watch",
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "start": "npx ts-node src/index.ts"
   },
   "author": "",
   "license": "ISC",

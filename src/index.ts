@@ -1,3 +1,4 @@
-export default function helloWorld() {
-  return "Hello, World!";
-}
+import Webserver from "./webserver";
+
+const webserver = new Webserver();
+webserver.start(8088);
