@@ -1,15 +1,20 @@
 import * as net from "net";
+import { parseRequest, HttpRequest } from "./parser/request-parser";
 
 export default class Webserver {
-  start(port: number) {
-    const server = net.createServer();
+  private server?: net.Server;
 
-    server.on("connection", (conn) => {
+  start(port: number, requestHandler: (request: HttpRequest) => string) {
+    this.server = net.createServer();
+    this.server.listen(port);
+
+    this.server.on("connection", (conn) => {
       console.log("connection");
 
       conn.on("data", (data) => {
-        console.log(`${data}`);
-        conn.write(data);
+        console.log(data.toString());
+        let response = requestHandler(parseRequest(data.toString()));
+        conn.write(response);
       });
 
       conn.on("close", () => {
@@ -21,10 +26,10 @@ export default class Webserver {
       });
     });
 
-    server.listen(port, () => {
-      console.log(`listening on ${port}`);
-    });
-
     console.log("Everything done, server started");
+  }
+
+  stop() {
+    this.server?.close();
   }
 }

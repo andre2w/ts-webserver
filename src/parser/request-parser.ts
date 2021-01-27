@@ -2,6 +2,10 @@ export interface Headers {
   [name: string]: string;
 }
 
+export interface Cookies {
+  [name: string]: string;
+}
+
 interface HttpRequestLine {
   method: string;
   uri: string;
@@ -10,20 +14,46 @@ interface HttpRequestLine {
 
 export type HttpRequest = HttpRequestLine & {
   headers: Headers;
+  cookies: Cookies;
 };
 
 export function parseRequest(request: string): HttpRequest {
-  const requestLines = request.split("\r\n")!;
+  const splitRequest = request.split("\r\n")!;
 
-  let httpInfo = requestLines.shift()!;
+  let httpInfo = splitRequest.shift()!;
   let httpRequestLine = parseRequestLine(httpInfo);
-  let headers = parseHeaders(requestLines);
-  let httpRequest = {
+
+  let cookies: Cookies = {};
+  for (let i = 0; i < splitRequest.length; i++) {
+    if (splitRequest[i]?.startsWith("Cookie")) {
+      let cookiesLine = splitRequest[i]?.substr(8);
+
+      if (cookiesLine !== undefined) {
+        cookiesLine
+          .split(";")
+          .map((cookie) => {
+            const splitCookie = cookie.split("=");
+            return { key: splitCookie[0]!, value: splitCookie[1]! };
+          })
+          .forEach(
+            (cookie) => (cookies[cookie.key.trim()] = cookie.value.trim())
+          );
+      }
+
+      splitRequest.splice(i, 1);
+      break;
+    }
+  }
+
+  splitRequest.find((header) => header.startsWith("Cookie"));
+
+  let headers = parseHeaders(splitRequest);
+
+  return {
     ...httpRequestLine,
     headers: headers,
+    cookies: cookies,
   };
-
-  return httpRequest;
 }
 
 function parseHeaders(requestHeaders: string[]): Headers {

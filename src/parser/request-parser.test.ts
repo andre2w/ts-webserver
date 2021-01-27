@@ -1,7 +1,7 @@
 import { HttpRequest, parseRequest } from "./request-parser";
 
 describe("Parsing an http GET request", () => {
-  test("the parsed request should contain header", () => {
+  test("the parsed request should contain request line and headers", () => {
     const request =
       `GET / HTTP/1.1\r\n` +
       `Host: localhost:8088\r\n` +
@@ -10,6 +10,7 @@ describe("Parsing an http GET request", () => {
       `Accept-Language: en-GB,en;q=0.5\r\n` +
       `Accept-Encoding: gzip, deflate\r\n` +
       `Connection: keep-alive\r\n` +
+      `Cookie: aCookie=withValue; otherCookie=withAnotherValue\r\n` +
       `Upgrade-Insecure-Requests: 1`;
 
     let httpRequest: HttpRequest = parseRequest(request);
@@ -27,6 +28,10 @@ describe("Parsing an http GET request", () => {
         Host: "localhost:8088",
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0",
+      },
+      cookies: {
+        aCookie: "withValue",
+        otherCookie: "withAnotherValue",
       },
     };
     expect(httpRequest).toStrictEqual(expectRequest);
