@@ -1,4 +1,5 @@
-import { HttpRequest, parseRequest } from "./request-parser";
+import { parseRequest } from "./requestParser";
+import { HttpRequest } from "../HttpRequest";
 
 describe("Parsing an http GET request", () => {
   test("the parsed request should contain request line and headers", () => {

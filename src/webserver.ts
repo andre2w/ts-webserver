@@ -1,10 +1,12 @@
 import * as net from "net";
-import { parseRequest, HttpRequest } from "./parser/request-parser";
+import { parseRequest } from "./parser/requestParser";
+import { HttpRequest } from "./HttpRequest";
+import { buildResponse, HttpResponse } from "./response/buildResponse";
 
 export default class Webserver {
   private server?: net.Server;
 
-  start(port: number, requestHandler: (request: HttpRequest) => string) {
+  start(port: number, requestHandler: (request: HttpRequest) => HttpResponse) {
     this.server = net.createServer();
     this.server.listen(port);
 
@@ -12,9 +14,8 @@ export default class Webserver {
       console.log("connection");
 
       conn.on("data", (data) => {
-        console.log(data.toString());
-        let response = requestHandler(parseRequest(data.toString()));
-        conn.write(response);
+        let httpResponse = requestHandler(parseRequest(data.toString()));
+        conn.write(buildResponse(httpResponse));
       });
 
       conn.on("close", () => {
