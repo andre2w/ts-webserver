@@ -1,59 +1,65 @@
 export interface Headers {
-  [name: string]: string
+  [name: string]: string;
 }
 
-export interface HttpRequest {
-  method: string,
-  url: string,
-  version: string,
-  host: string,
-  userAgent?: string,
-  headers: Headers
+interface HttpRequestLine {
+  method: string;
+  uri: string;
+  version: string;
 }
+
+export type HttpRequest = HttpRequestLine & {
+  headers: Headers;
+};
 
 export function parseRequest(request: string): HttpRequest {
-  const requestLines = request.split('\r\n')!;
-  let httpRequest: HttpRequest = {
-    method: "",
-    url: "",
-    version: "",
-    host: "",
-    userAgent: "",
-    headers: {}
-  };
+  const requestLines = request.split("\r\n")!;
 
   let httpInfo = requestLines.shift()!;
-  let [method, url, version] = httpInfo.split(' ');
-  if (typeof method === 'string') {
-    httpRequest.method = method;
-  }
+  let httpRequestLine = parseRequestLine(httpInfo);
+  let headers = parseHeaders(requestLines);
+  let httpRequest = {
+    ...httpRequestLine,
+    headers: headers,
+  };
 
-  if (typeof url === 'string') {
-    httpRequest.url = url;
-  }
-
-  if (typeof version === 'string') {
-    httpRequest.version = version;
-  }
-
-  for (let requestLine of requestLines) {
-    let delimiterIndex = requestLine.indexOf(':');
-    let key = requestLine.substring(0, delimiterIndex);
-    let value = requestLine.substring(delimiterIndex + 1);
-
-    if (typeof value === 'string') {
-      if (key === 'Host') {
-        httpRequest.host = value.trim();
-      } else if (key === 'User-Agent') {
-        httpRequest.userAgent = value.trim();
-      } else {
-        if (typeof key === 'string') {
-          httpRequest.headers[key] = value.trim();
-        }
-      }
-    }
-
-  }
   return httpRequest;
 }
 
+function parseHeaders(requestHeaders: string[]): Headers {
+  const parseHeader = (header: string): { key: string; value: string } => {
+    let delimiterIndex = header.indexOf(":");
+    let key = header.substring(0, delimiterIndex);
+    let value = header.substring(delimiterIndex + 1);
+    return { key: key, value: value.trim() };
+  };
+
+  let headers: Headers = {};
+  requestHeaders
+    .map(parseHeader)
+    .forEach((header) => (headers[header.key] = header.value));
+  return headers;
+}
+
+function parseRequestLine(line: string): HttpRequestLine {
+  let [method, url, version] = line.split(" ");
+  let result = {
+    method: "",
+    uri: "",
+    version: "",
+  };
+
+  if (typeof method === "string") {
+    result.method = method;
+  }
+
+  if (typeof url === "string") {
+    result.uri = url;
+  }
+
+  if (typeof version === "string") {
+    result.version = version;
+  }
+
+  return result;
+}
