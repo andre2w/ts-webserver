@@ -28,9 +28,9 @@ export function parseRequest(request: string): HttpRequest {
 
 function parseHeaders(requestHeaders: string[]): Headers {
   const parseHeader = (header: string): { key: string; value: string } => {
-    let delimiterIndex = header.indexOf(":");
-    let key = header.substring(0, delimiterIndex);
-    let value = header.substring(delimiterIndex + 1);
+    const delimiterIndex = header.indexOf(":");
+    const key = header.substring(0, delimiterIndex);
+    const value = header.substring(delimiterIndex + 1);
     return { key: key, value: value.trim() };
   };
 
