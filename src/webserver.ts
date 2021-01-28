@@ -11,23 +11,27 @@ export default class Webserver {
     this.server.listen(port);
 
     this.server.on("connection", (conn) => {
-      console.log("connection");
-
       conn.on("data", (data) => {
-        let httpResponse = requestHandler(parseRequest(data.toString()));
-        conn.write(buildResponse(httpResponse));
+        let httpResponse: string;
+        try {
+          httpResponse = buildResponse(
+            requestHandler(parseRequest(data.toString()))
+          );
+        } catch (error) {
+          httpResponse = buildResponse({
+            code: 400,
+            body: "",
+            headers: {},
+          });
+        }
+
+        conn.write(httpResponse);
       });
 
-      conn.on("close", () => {
-        console.log("Connection closed");
-      });
+      conn.on("close", () => {});
 
-      conn.on("error", () => {
-        console.log("oh no!");
-      });
+      conn.on("error", () => {});
     });
-
-    console.log("Everything done, server started");
   }
 
   stop() {

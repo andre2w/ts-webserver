@@ -7,15 +7,20 @@ export interface HttpResponse {
 }
 
 export function buildResponse(httpResponse: HttpResponse): string {
-  let response: string[] = [`HTTP/1.1 ${httpResponse.code} OK`];
-  response.push("Server: ts-webserver");
-  response.push(`Content-Length: ${httpResponse.body.length}`);
+  let responseLines: string[] = [`HTTP/1.1 ${httpResponse.code} OK`];
+  responseLines.push("Server: ts-webserver");
+  responseLines.push(`Content-Length: ${httpResponse.body.length}`);
 
   Object.keys(httpResponse.headers)
     .map((header) => {
       return { key: header, value: httpResponse.headers[header] };
     })
-    .forEach((header) => response.push(`${header.key}: ${header.value}`));
+    .forEach((header) => responseLines.push(`${header.key}: ${header.value}`));
 
-  return `${response.join(`\r\n`)}\r\n\r\n${httpResponse.body}\r\n`;
+  let response = `${responseLines.join(`\r\n`)}\r\n`;
+  if (httpResponse.body !== "") {
+    response += `\r\n${httpResponse.body}`;
+  }
+  response += `\r\n`;
+  return response;
 }

@@ -16,3 +16,5 @@ export type HttpRequest = HttpRequestLine & {
   headers: Headers;
   cookies: Cookies;
 };
+
+export class InvalidRequestError extends Error {}

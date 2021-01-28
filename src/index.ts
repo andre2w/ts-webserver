@@ -2,10 +2,19 @@ import Webserver from "./webserver";
 
 const webserver = new Webserver();
 webserver.start(8088, (request) => {
-  console.log(request);
+  const responseBody = JSON.stringify({
+    field: request.version,
+    otherField: "otherValue",
+    somethingHere: "also here",
+    andANumber: 132,
+    throwABoolean: true,
+  });
+
   return {
     code: 200,
-    body: `<h1>Hello There</h1>`,
-    headers: {},
+    body: responseBody,
+    headers: {
+      "X-Correlation-Id": "asdfsdf-asdf",
+    },
   };
 });
