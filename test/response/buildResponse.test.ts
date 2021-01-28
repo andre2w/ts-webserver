@@ -1,4 +1,4 @@
-import { buildResponse } from "./buildResponse";
+import { buildResponse } from "../../src/response/buildResponse";
 
 describe("Building an HTTP response", () => {
   test("building basic response", () => {

@@ -1,5 +1,5 @@
 import * as net from "net";
-import { parseRequest } from "./parser/requestParser";
+import { parseRequest } from "./request/requestParser";
 import { HttpRequest } from "./HttpRequest";
 import { buildResponse, HttpResponse } from "./response/buildResponse";
 
