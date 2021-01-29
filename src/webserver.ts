@@ -1,7 +1,7 @@
 import * as net from "net";
 import { parseRequest } from "./request/requestParser";
-import { HttpRequest } from "./HttpRequest";
-import { buildResponse, HttpResponse } from "./response/buildResponse";
+import { buildResponse } from "./response/buildResponse";
+import { HttpRequest, HttpResponse } from "./Http";
 
 export default class Webserver {
   private server?: net.Server;
@@ -12,20 +12,16 @@ export default class Webserver {
 
     this.server.on("connection", (conn) => {
       conn.on("data", (data) => {
-        let httpResponse: string;
+        let response: string;
         try {
-          httpResponse = buildResponse(
-            requestHandler(parseRequest(data.toString()))
-          );
+          const httpRequest = parseRequest(data.toString());
+          const httpResponse = requestHandler(httpRequest);
+          response = buildResponse(httpResponse);
         } catch (error) {
-          httpResponse = buildResponse({
-            code: 400,
-            body: "",
-            headers: {},
-          });
+          response = buildResponse(new HttpResponse(400, ""));
         }
 
-        conn.write(httpResponse);
+        conn.write(response);
       });
 
       conn.on("close", () => {});

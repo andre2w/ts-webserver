@@ -1,4 +1,4 @@
-import { HttpRequest, HttpRequestLine } from "../HttpRequest";
+import { HttpRequest, HttpRequestLine } from "../Http";
 import { parseCookies } from "./parseCookies";
 import { parseHeaders } from "./parseHeaders";
 

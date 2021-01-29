@@ -1,4 +1,4 @@
-import { Cookies } from "../HttpRequest";
+import { Cookies } from "../Http";
 
 export function parseCookies(requestHeaders: string[]): Cookies {
   let cookieHeader = requestHeaders

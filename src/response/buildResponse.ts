@@ -1,26 +1,20 @@
-import { Headers } from "../HttpRequest";
+import { HttpResponse } from "../Http";
 
-export interface HttpResponse {
-  code: number;
-  body: string;
-  headers: Headers;
-}
+const lineBreak = "\r\n";
 
 export function buildResponse(httpResponse: HttpResponse): string {
   let responseLines: string[] = [`HTTP/1.1 ${httpResponse.code} OK`];
   responseLines.push("Server: ts-webserver");
-  responseLines.push(`Content-Length: ${httpResponse.body.length}`);
+  responseLines.push(`Content-Length: ${httpResponse.bodyLength()}`);
 
-  Object.keys(httpResponse.headers)
-    .map((header) => {
-      return { key: header, value: httpResponse.headers[header] };
-    })
-    .forEach((header) => responseLines.push(`${header.key}: ${header.value}`));
-
-  let response = `${responseLines.join(`\r\n`)}\r\n`;
-  if (httpResponse.body !== "") {
-    response += `\r\n${httpResponse.body}`;
+  for (let header of httpResponse.headers.entries()) {
+    responseLines.push(`${header[0]}: ${header[1]}`);
   }
-  response += `\r\n`;
+
+  let response = `${responseLines.join(lineBreak)}${lineBreak}`;
+  if (httpResponse.hasBody()) {
+    response += `${lineBreak}${httpResponse.body}`;
+  }
+  response += `${lineBreak}`;
   return response;
 }

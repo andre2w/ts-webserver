@@ -1,16 +1,11 @@
 import { buildResponse } from "../../src/response/buildResponse";
+import { HttpResponse } from "../../src/Http";
 
 describe("Building an HTTP response", () => {
   test("building basic response", () => {
-    let httpResponse = {
-      code: 200,
-      body: "Hello there!",
-      headers: {
-        "X-Correlation-Id": "123",
-      },
-    };
-
-    let builtResponse = buildResponse(httpResponse);
+    const httpResponse = new HttpResponse(200, "Hello there!");
+    httpResponse.addHeader("X-Correlation-Id", "123");
+    const builtResponse = buildResponse(httpResponse);
 
     const expectedResponse =
       `HTTP/1.1 200 OK\r\n` +

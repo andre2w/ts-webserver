@@ -1,4 +1,5 @@
 import Webserver from "./webserver";
+import { HttpResponse } from "./Http";
 
 const webserver = new Webserver();
 webserver.start(8088, (request) => {
@@ -10,11 +11,5 @@ webserver.start(8088, (request) => {
     throwABoolean: true,
   });
 
-  return {
-    code: 200,
-    body: responseBody,
-    headers: {
-      "X-Correlation-Id": "asdfsdf-asdf",
-    },
-  };
+  return new HttpResponse(200, responseBody);
 });

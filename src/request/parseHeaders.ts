@@ -1,4 +1,4 @@
-import { Headers } from "../HttpRequest";
+import { Headers } from "../Http";
 
 export function parseHeaders(requestHeaders: string[]): Headers {
   const parseHeader = (header: string): { key: string; value: string } => {
