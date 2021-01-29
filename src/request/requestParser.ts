@@ -18,26 +18,15 @@ export function parseRequest(request: string): HttpRequest {
 }
 
 function parseRequestLine(line: string): HttpRequestLine {
-  let [method, url, version] = line.split(" ");
-  let result = {
-    method: "",
-    uri: "",
-    version: "",
-  };
+  let [method, uri, version] = line.split(" ");
 
-  if (typeof method === "string") {
-    result.method = method;
-  }
-
-  if (typeof url === "string") {
-    result.uri = url;
-  }
-
-  if (version === undefined) {
+  if (method === undefined || uri === undefined || version === undefined) {
     throw new InvalidRequestError();
-  } else {
-    result.version = version;
   }
 
-  return result;
+  return {
+    method,
+    uri,
+    version,
+  };
 }
