@@ -1,5 +1,5 @@
 import { parseRequest } from "../../src/request/requestParser";
-import { HttpRequest } from "../../src/HttpRequest";
+import { HttpRequest, InvalidRequestError } from "../../src/Http";
 
 describe("Parsing an http GET request", () => {
   test("the parsed request should contain request line and headers", () => {
@@ -36,5 +36,14 @@ describe("Parsing an http GET request", () => {
       },
     };
     expect(httpRequest).toStrictEqual(expectRequest);
+  });
+
+  test("fail parsing when request line is wrong", () => {
+    const request =
+      `GET HTTP/1.1\r\n` +
+      `Host: localhost:8088\r\n` +
+      `Upgrade-Insecure-Requests: 1\r\n`;
+
+    expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
   });
 });

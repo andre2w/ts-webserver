@@ -1,4 +1,4 @@
-import { HttpRequest, HttpRequestLine } from "../Http";
+import { HttpRequest, HttpRequestLine, InvalidRequestError } from "../Http";
 import { parseCookies } from "./parseCookies";
 import { parseHeaders } from "./parseHeaders";
 
@@ -33,7 +33,9 @@ function parseRequestLine(line: string): HttpRequestLine {
     result.uri = url;
   }
 
-  if (typeof version === "string") {
+  if (version === undefined) {
+    throw new InvalidRequestError();
+  } else {
     result.version = version;
   }
 
