@@ -69,4 +69,16 @@ describe("Parsing an http GET request", () => {
 
     expect(parseRequest(request)).toStrictEqual(expectedRequest);
   });
+
+  test.each(["Upgrade-Insecure-Requests 1", ": test"])(
+    "Fail when parsing an invalid header",
+    (header) => {
+      const request =
+        `GET / HTTP/1.1 otherInformation\r\n` +
+        `Host: localhost:8088\r\n` +
+        `${header}\r\n`;
+
+      expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
+    }
+  );
 });

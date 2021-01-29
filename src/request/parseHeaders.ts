@@ -1,4 +1,4 @@
-import { Headers } from "../Http";
+import { Headers, InvalidRequestError } from "../Http";
 
 interface Header {
   key: string;
@@ -16,6 +16,11 @@ export function parseHeaders(requestHeaders: string[]): Headers {
 
 const parseHeader: (header: string) => Header = (header) => {
   const delimiterIndex = header.indexOf(":");
+
+  if (delimiterIndex <= 0) {
+    throw new InvalidRequestError();
+  }
+
   const key = header.substring(0, delimiterIndex);
   const value = header.substring(delimiterIndex + 1);
   return { key: key, value: value.trim() };
