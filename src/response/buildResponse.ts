@@ -1,4 +1,4 @@
-import { HttpResponse } from "../Http";
+import { Cookie, HttpResponse } from "../Http";
 
 const lineBreak = "\r\n";
 
@@ -29,25 +29,31 @@ function buildHeaders(httpResponse: HttpResponse, responseLines: string[]) {
   }
 }
 
+const attributeNames = new Map([
+  ["expires", "Expires"],
+  ["maxAge", "Max-Age"],
+  ["domain", "Domain"],
+]);
+
 function buildCookies(httpResponse: HttpResponse, responseLines: string[]) {
   for (let cookie of httpResponse.cookies.entries()) {
-    const cookieAttributes = cookie[1];
-    const cookieName = cookie[0];
-
-    let cookieLine = `Set-Cookie: ${cookieName}=${cookieAttributes.value}`;
-
-    if (cookieAttributes.expires !== undefined) {
-      cookieLine += `; Expires=${cookieAttributes.expires.toUTCString()}`;
-    }
-
-    if (cookieAttributes.maxAge !== undefined) {
-      cookieLine += `; Max-Age=${cookieAttributes.maxAge}`;
-    }
-
-    if (cookieAttributes.domain !== undefined) {
-      cookieLine += `; Domain=${cookieAttributes.domain}`;
-    }
+    let cookieLine = buildCookie(cookie);
 
     responseLines.push(cookieLine);
   }
+}
+
+function buildCookie(cookie: [string, Cookie]) {
+  const cookieAttributes = cookie[1];
+  const cookieName = cookie[0];
+
+  let cookieLine = `Set-Cookie: ${cookieName}=${cookieAttributes.value}`;
+
+  for (const [attr, value] of Object.entries(cookieAttributes)) {
+    if (attributeNames.has(attr)) {
+      const cookieValue = value instanceof Date ? value.toUTCString() : value;
+      cookieLine += `; ${attributeNames.get(attr)}=${cookieValue}`;
+    }
+  }
+  return cookieLine;
 }
