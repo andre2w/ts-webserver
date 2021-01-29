@@ -50,7 +50,7 @@ describe("Building an HTTP response", () => {
     test("set a cookie with expire date", () => {
       const httpResponse = new HttpResponse(200);
       const cookieExpiration = new Date(2021, 2, 1, 10, 10, 10);
-      httpResponse.addCookie("signedIn", "true", cookieExpiration);
+      httpResponse.addCookie("signedIn", "true", { expires: cookieExpiration });
       const builtResponse = buildResponse(httpResponse);
 
       const expectedResponse =
@@ -58,6 +58,21 @@ describe("Building an HTTP response", () => {
         `Server: ts-webserver\r\n` +
         `Content-Length: 0\r\n` +
         `Set-Cookie: signedIn=true; Expires=${cookieExpiration.toUTCString()}\r\n` +
+        `\r\n`;
+
+      expect(builtResponse).toBe(expectedResponse);
+    });
+
+    test("set a cookie with Max Age", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", { maxAge: 150 });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; Max-Age=150\r\n` +
         `\r\n`;
 
       expect(builtResponse).toBe(expectedResponse);

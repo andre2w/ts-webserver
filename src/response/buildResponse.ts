@@ -40,6 +40,10 @@ function buildCookies(httpResponse: HttpResponse, responseLines: string[]) {
       cookieLine += `; Expires=${cookieAttributes.expires.toUTCString()}`;
     }
 
+    if (cookieAttributes.maxAge !== undefined) {
+      cookieLine += `; Max-Age=${cookieAttributes.maxAge}`;
+    }
+
     responseLines.push(cookieLine);
   }
 }

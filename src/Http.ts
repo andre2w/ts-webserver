@@ -22,6 +22,7 @@ export class InvalidRequestError extends Error {}
 export interface Cookie {
   value: string;
   expires?: Date;
+  maxAge?: number;
 }
 
 export class HttpResponse {
@@ -44,9 +45,12 @@ export class HttpResponse {
     return this._cookies;
   }
 
-  addCookie(name: string, value: string, expires?: Date): void {
-    expires = expires;
-    this._cookies.set(name, { value, expires });
+  addCookie(
+    name: string,
+    value: string,
+    attributes: { expires?: Date; maxAge?: number } = {}
+  ): void {
+    this._cookies.set(name, { ...attributes, value });
   }
 
   hasBody(): boolean {
