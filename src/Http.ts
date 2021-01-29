@@ -22,7 +22,7 @@ export class InvalidRequestError extends Error {}
 export class HttpResponse {
   constructor(
     public code: number,
-    public body: string,
+    public body?: string,
     private _headers: Map<string, string> = new Map(),
     private _cookies: Map<string, string> = new Map()
   ) {}
@@ -44,10 +44,10 @@ export class HttpResponse {
   }
 
   hasBody(): boolean {
-    return this.body !== "";
+    return this.body !== undefined;
   }
 
   bodyLength(): number {
-    return this.body.length;
+    return this.body?.length || 0;
   }
 }

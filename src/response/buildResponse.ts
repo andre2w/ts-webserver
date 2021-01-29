@@ -11,10 +11,15 @@ export function buildResponse(httpResponse: HttpResponse): string {
     responseLines.push(`${header[0]}: ${header[1]}`);
   }
 
+  for (let cookie of httpResponse.cookies.entries()) {
+    responseLines.push(`Set-Cookie: ${cookie[0]}=${cookie[1]}`);
+  }
+
   let response = `${responseLines.join(lineBreak)}${lineBreak}`;
   if (httpResponse.hasBody()) {
     response += `${lineBreak}${httpResponse.body}`;
   }
+
   response += `${lineBreak}`;
   return response;
 }
