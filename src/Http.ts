@@ -19,11 +19,15 @@ export type HttpRequest = HttpRequestLine & {
 
 export class InvalidRequestError extends Error {}
 
-export interface Cookie {
-  value: string;
+export interface CookieAttributes {
   expires?: Date;
   maxAge?: number;
+  domain?: string;
 }
+
+export type Cookie = CookieAttributes & {
+  value: string;
+};
 
 export class HttpResponse {
   constructor(
@@ -48,7 +52,7 @@ export class HttpResponse {
   addCookie(
     name: string,
     value: string,
-    attributes: { expires?: Date; maxAge?: number } = {}
+    attributes: CookieAttributes = {}
   ): void {
     this._cookies.set(name, { ...attributes, value });
   }

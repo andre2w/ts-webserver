@@ -77,5 +77,20 @@ describe("Building an HTTP response", () => {
 
       expect(builtResponse).toBe(expectedResponse);
     });
+
+    test("set a cookie with domain", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", { domain: "example.org" });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; Domain=example.org\r\n` +
+        `\r\n`;
+
+      expect(builtResponse).toBe(expectedResponse);
+    });
   });
 });

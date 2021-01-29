@@ -44,6 +44,10 @@ function buildCookies(httpResponse: HttpResponse, responseLines: string[]) {
       cookieLine += `; Max-Age=${cookieAttributes.maxAge}`;
     }
 
+    if (cookieAttributes.domain !== undefined) {
+      cookieLine += `; Domain=${cookieAttributes.domain}`;
+    }
+
     responseLines.push(cookieLine);
   }
 }
