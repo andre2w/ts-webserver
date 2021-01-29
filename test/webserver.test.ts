@@ -3,26 +3,37 @@ import axios from "axios";
 import { HttpResponse, InvalidRequestError } from "../src/Http";
 
 describe("A webserver", () => {
-  test("Can receive simple get requests", async () => {
-    const webserver = new Webserver();
-    webserver.start(8088, () => new HttpResponse(200, "Request Successful"));
+  const webserver = new Webserver();
+  const port = 8088;
 
-    const response = await axios.get<string>("http://localhost:8088");
-    webserver.stop();
-    expect(response.data).toEqual("Request Successful");
+  beforeAll(() => {
+    webserver.start(port, (request) => {
+      if (request.uri === "/success") {
+        return new HttpResponse(200, "Request Successful");
+      } else {
+        throw new InvalidRequestError();
+      }
+    });
   });
 
-  xtest("Return error response when fails to parse request", async () => {
-    const webserver = new Webserver();
-    const port = 8088;
-    const mockFn = jest.fn(() => {
-      throw new InvalidRequestError();
-    });
-    webserver.start(port, mockFn);
+  test("Can receive simple get requests", async () => {
+    const response = await axios.get<string>(
+      `http://localhost:${port}/success`
+    );
 
-    const response = await axios.get<string>(`http://localhost:${port}`);
-    console.log(response);
+    expect(response.data).toBe("Request Successful");
+    expect(response.status).toBe(200);
+  });
+
+  test("Return error response when fails to parse request", async () => {
+    try {
+      await axios.get<string>(`http://localhost:${port}/error`);
+    } catch (error) {
+      expect(error.response.status).toBe(400);
+    }
+  });
+
+  afterAll(() => {
     webserver.stop();
-    expect(response.status).toEqual(400);
   });
 });

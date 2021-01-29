@@ -12,7 +12,7 @@ describe("Parsing an http GET request", () => {
       `Accept-Encoding: gzip, deflate\r\n` +
       `Connection: keep-alive\r\n` +
       `Cookie: aCookie=withValue; otherCookie=withAnotherValue\r\n` +
-      `Upgrade-Insecure-Requests: 1`;
+      `Upgrade-Insecure-Requests: 1\r\n`;
 
     let httpRequest: HttpRequest = parseRequest(request);
     const expectRequest = {
@@ -38,12 +38,35 @@ describe("Parsing an http GET request", () => {
     expect(httpRequest).toStrictEqual(expectRequest);
   });
 
-  test("fail parsing when request line is wrong", () => {
+  test.each(["GET HTTP/1.1", "GET", ""])(
+    "Fail parsing when request has missing information",
+    (line) => {
+      const request =
+        `${line}\r\n` +
+        `Host: localhost:8088\r\n` +
+        `Upgrade-Insecure-Requests: 1\r\n`;
+
+      expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
+    }
+  );
+
+  test("should allow requests with more information than needed", () => {
     const request =
-      `GET HTTP/1.1\r\n` +
+      `GET / HTTP/1.1 otherInformation\r\n` +
       `Host: localhost:8088\r\n` +
       `Upgrade-Insecure-Requests: 1\r\n`;
 
-    expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
+    const expectedRequest = {
+      method: "GET",
+      uri: "/",
+      version: "HTTP/1.1",
+      headers: {
+        "Upgrade-Insecure-Requests": "1",
+        Host: "localhost:8088",
+      },
+      cookies: {},
+    };
+
+    expect(parseRequest(request)).toStrictEqual(expectedRequest);
   });
 });
