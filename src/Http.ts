@@ -19,12 +19,17 @@ export type HttpRequest = HttpRequestLine & {
 
 export class InvalidRequestError extends Error {}
 
+export interface Cookie {
+  value: string;
+  expires?: Date;
+}
+
 export class HttpResponse {
   constructor(
     public code: number,
     public body?: string,
     private _headers: Map<string, string> = new Map(),
-    private _cookies: Map<string, string> = new Map()
+    private _cookies: Map<string, Cookie> = new Map()
   ) {}
 
   get headers(): Map<string, string> {
@@ -35,12 +40,13 @@ export class HttpResponse {
     this._headers.set(name, value);
   }
 
-  get cookies(): Map<string, string> {
+  get cookies(): Map<string, Cookie> {
     return this._cookies;
   }
 
-  addCookie(name: string, value: string): void {
-    this._cookies.set(name, value);
+  addCookie(name: string, value: string, expires?: Date): void {
+    expires = expires;
+    this._cookies.set(name, { value, expires });
   }
 
   hasBody(): boolean {

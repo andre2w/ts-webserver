@@ -11,5 +11,8 @@ webserver.start(8088, (request) => {
     throwABoolean: true,
   });
 
-  return new HttpResponse(200, responseBody);
+  let response = new HttpResponse(200, responseBody);
+  response.addCookie("test", "value");
+
+  return response;
 });

@@ -12,7 +12,16 @@ export function buildResponse(httpResponse: HttpResponse): string {
   }
 
   for (let cookie of httpResponse.cookies.entries()) {
-    responseLines.push(`Set-Cookie: ${cookie[0]}=${cookie[1]}`);
+    const cookieAttributes = cookie[1];
+    const cookieName = cookie[0];
+
+    let cookieLine = `Set-Cookie: ${cookieName}=${cookieAttributes.value}`;
+
+    if (cookieAttributes.expires !== undefined) {
+      cookieLine += `; Expires=${cookieAttributes.expires.toUTCString()}`;
+    }
+
+    responseLines.push(cookieLine);
   }
 
   let response = `${responseLines.join(lineBreak)}${lineBreak}`;
