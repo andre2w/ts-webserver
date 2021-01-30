@@ -23,6 +23,8 @@ export interface CookieAttributes {
   expires?: Date;
   maxAge?: number;
   domain?: string;
+  path?: string;
+  secure?: boolean;
 }
 
 export type Cookie = CookieAttributes & {

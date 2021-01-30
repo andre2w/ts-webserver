@@ -33,12 +33,13 @@ const attributeNames = new Map([
   ["expires", "Expires"],
   ["maxAge", "Max-Age"],
   ["domain", "Domain"],
+  ["path", "Path"],
+  ["secure", "Secure"],
 ]);
 
 function buildCookies(httpResponse: HttpResponse, responseLines: string[]) {
   for (let cookie of httpResponse.cookies.entries()) {
     let cookieLine = buildCookie(cookie);
-
     responseLines.push(cookieLine);
   }
 }
@@ -51,8 +52,14 @@ function buildCookie(cookie: [string, Cookie]) {
 
   for (const [attr, value] of Object.entries(cookieAttributes)) {
     if (attributeNames.has(attr)) {
-      const cookieValue = value instanceof Date ? value.toUTCString() : value;
-      cookieLine += `; ${attributeNames.get(attr)}=${cookieValue}`;
+      if (attr === "secure") {
+        if (value === true) {
+          cookieLine += "; Secure";
+        }
+      } else {
+        const cookieValue = value instanceof Date ? value.toUTCString() : value;
+        cookieLine += `; ${attributeNames.get(attr)}=${cookieValue}`;
+      }
     }
   }
   return cookieLine;

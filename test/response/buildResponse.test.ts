@@ -92,5 +92,50 @@ describe("Building an HTTP response", () => {
 
       expect(builtResponse).toBe(expectedResponse);
     });
+
+    test("set a cookie with a path", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", { path: "/customers" });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; Path=/customers\r\n` +
+        `\r\n`;
+
+      expect(builtResponse).toBe(expectedResponse);
+    });
+
+    test("set a secure cookie", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", { secure: true });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; Secure\r\n` +
+        `\r\n`;
+
+      expect(builtResponse).toBe(expectedResponse);
+    });
+
+    test("should not add the Secure tag when attribute is false", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", { secure: false });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true\r\n` +
+        `\r\n`;
+
+      expect(builtResponse).toBe(expectedResponse);
+    });
   });
 });
