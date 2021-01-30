@@ -25,6 +25,7 @@ export interface CookieAttributes {
   domain?: string;
   path?: string;
   secure?: boolean;
+  httpOnly?: boolean;
 }
 
 export type Cookie = CookieAttributes & {

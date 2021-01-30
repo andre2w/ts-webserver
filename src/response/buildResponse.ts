@@ -35,6 +35,7 @@ const attributeNames = new Map([
   ["domain", "Domain"],
   ["path", "Path"],
   ["secure", "Secure"],
+  ["httpOnly", "HttpOnly"],
 ]);
 
 function buildCookies(httpResponse: HttpResponse, responseLines: string[]) {
@@ -52,9 +53,9 @@ function buildCookie(cookie: [string, Cookie]) {
 
   for (const [attr, value] of Object.entries(cookieAttributes)) {
     if (attributeNames.has(attr)) {
-      if (attr === "secure") {
+      if (attr === "secure" || attr === "httpOnly") {
         if (value === true) {
-          cookieLine += "; Secure";
+          cookieLine += `; ${attributeNames.get(attr)}`;
         }
       } else {
         const cookieValue = value instanceof Date ? value.toUTCString() : value;

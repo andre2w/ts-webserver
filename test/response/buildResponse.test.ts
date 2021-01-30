@@ -137,5 +137,20 @@ describe("Building an HTTP response", () => {
 
       expect(builtResponse).toBe(expectedResponse);
     });
+
+    test("set a httpOnly cookie", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", { httpOnly: true });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; HttpOnly\r\n` +
+        `\r\n`;
+
+      expect(builtResponse).toBe(expectedResponse);
+    });
   });
 });
