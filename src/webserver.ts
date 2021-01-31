@@ -18,7 +18,7 @@ export default class Webserver {
           const httpResponse = requestHandler(httpRequest);
           response = buildResponse(httpResponse);
         } catch (error) {
-          response = buildResponse(new HttpResponse(400, ""));
+          response = buildResponse(new HttpResponse(400));
         }
 
         conn.write(response);

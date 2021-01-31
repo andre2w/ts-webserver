@@ -1,8 +1,12 @@
-import { HttpRequest, HttpRequestLine, InvalidRequestError } from "../Http";
+import {
+  HttpRequestClass,
+  HttpRequestLine,
+  InvalidRequestError,
+} from "../Http";
 import { parseCookies } from "./parseCookies";
 import { parseHeaders } from "./parseHeaders";
 
-export function parseRequest(request: string): HttpRequest {
+export function parseRequest(request: string): HttpRequestClass {
   const splitRequest = request.split("\r\n")!;
 
   let httpInfo = splitRequest.shift()!;
@@ -10,11 +14,16 @@ export function parseRequest(request: string): HttpRequest {
   let cookies = parseCookies(splitRequest);
   let headers = parseHeaders(splitRequest);
 
-  return {
-    ...httpRequestLine,
-    headers: headers,
-    cookies: cookies,
-  };
+  const httpRequest = new HttpRequestClass(httpRequestLine);
+
+  Object.entries(cookies).forEach((cookie) =>
+    httpRequest.addCookie(cookie[0], cookie[1])
+  );
+  Object.entries(headers).forEach((header) =>
+    httpRequest.addHeader(header[0], header[1])
+  );
+
+  return httpRequest;
 }
 
 function parseRequestLine(line: string): HttpRequestLine {

@@ -12,10 +12,27 @@ export interface HttpRequestLine {
   version: string;
 }
 
-export type HttpRequest = HttpRequestLine & {
-  headers: Headers;
-  cookies: Cookies;
-};
+export class HttpRequest {
+  readonly method: string;
+  readonly uri: string;
+  readonly version: string;
+  readonly headers: Map<string, string> = new Map();
+  readonly cookies: Map<string, string> = new Map();
+
+  constructor(requestLine: HttpRequestLine) {
+    this.method = requestLine.method;
+    this.uri = requestLine.uri;
+    this.version = requestLine.version;
+  }
+
+  addHeader(name: string, value: string): void {
+    this.headers.set(name, value);
+  }
+
+  addCookie(name: string, value: string): void {
+    this.cookies.set(name, value);
+  }
+}
 
 export class InvalidRequestError extends Error {}
 
