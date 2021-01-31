@@ -1,32 +1,38 @@
 import { Cookie, HttpResponse } from "../Http";
+import StringJoiner from "../StringJoiner";
 
 const lineBreak = "\r\n";
 
 export function buildResponse(httpResponse: HttpResponse): string {
-  let responseLines: string[] = [`HTTP/1.1 ${httpResponse.code} OK`];
-  responseLines.push("Server: ts-webserver");
-  responseLines.push(`Content-Length: ${httpResponse.bodyLength()}`);
+  const response = new StringJoiner(lineBreak, { suffix: lineBreak });
+  response.add(`HTTP/1.1 ${httpResponse.code} OK`);
+  response.add("Server: ts-webserver");
+  response.add(`Content-Length: ${httpResponse.bodyLength()}`);
 
-  buildHeaders(httpResponse, responseLines);
-  buildCookies(httpResponse, responseLines);
-
-  let response = `${responseLines.join(lineBreak)}${lineBreak}`;
-  response += buildBody(httpResponse);
-  response += `${lineBreak}`;
-  return response;
-}
-
-function buildBody(httpResponse: HttpResponse) {
-  if (httpResponse.hasBody()) {
-    return `${lineBreak}${httpResponse.body}`;
+  if (httpResponse.headers.size > 0) {
+    buildHeaders(httpResponse).forEach((header) => response.add(header));
   }
-  return "";
+
+  if (httpResponse.cookies.size > 0) {
+    buildCookies(httpResponse).forEach((cookie) => response.add(cookie));
+  }
+
+  // This line is to separate the headers and body
+  response.add("");
+
+  if (httpResponse.body !== undefined) {
+    response.add(httpResponse.body);
+  }
+
+  return response.toString();
 }
 
-function buildHeaders(httpResponse: HttpResponse, responseLines: string[]) {
+function buildHeaders(httpResponse: HttpResponse): string[] {
+  let result = [];
   for (let header of httpResponse.headers.entries()) {
-    responseLines.push(`${header[0]}: ${header[1]}`);
+    result.push(`${header[0]}: ${header[1]}`);
   }
+  return result;
 }
 
 const attributeNames = new Map([
@@ -36,22 +42,21 @@ const attributeNames = new Map([
   ["path", "Path"],
   ["secure", "Secure"],
   ["httpOnly", "HttpOnly"],
+  ["sameSite", "SameSite"],
 ]);
 
-function buildCookies(httpResponse: HttpResponse, responseLines: string[]) {
-  for (let cookie of httpResponse.cookies.entries()) {
-    let cookieLine = buildCookie(cookie);
-    responseLines.push(cookieLine);
-  }
+function buildCookies(httpResponse: HttpResponse): string[] {
+  let result: string[] = [];
+  httpResponse.cookies.forEach((attributtes, name) =>
+    result.push(buildCookie(name, attributtes))
+  );
+  return result;
 }
 
-function buildCookie(cookie: [string, Cookie]) {
-  const cookieAttributes = cookie[1];
-  const cookieName = cookie[0];
+function buildCookie(name: string, attributtes: Cookie): string {
+  let cookieLine = `Set-Cookie: ${name}=${attributtes.value}`;
 
-  let cookieLine = `Set-Cookie: ${cookieName}=${cookieAttributes.value}`;
-
-  for (const [attr, value] of Object.entries(cookieAttributes)) {
+  for (const [attr, value] of Object.entries(attributtes)) {
     if (attributeNames.has(attr)) {
       if (attr === "secure" || attr === "httpOnly") {
         if (value === true) {

@@ -152,5 +152,91 @@ describe("Building an HTTP response", () => {
 
       expect(builtResponse).toBe(expectedResponse);
     });
+
+    test("set a cookie with the same site attribute", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", { sameSite: "Strict" });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; SameSite=Strict\r\n` +
+        `\r\n`;
+
+      expect(builtResponse).toBe(expectedResponse);
+    });
+
+    test("set a cookie with multiple attributes", () => {
+      const httpResponse = new HttpResponse(200);
+      httpResponse.addCookie("signedIn", "true", {
+        httpOnly: true,
+        sameSite: "Lax",
+        maxAge: 150,
+      });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; HttpOnly; SameSite=Lax; Max-Age=150\r\n` +
+        `\r\n`;
+      expect(builtResponse).toBe(expectedResponse);
+    });
+
+    test("set a cookie with all the attributes", () => {
+      const httpResponse = new HttpResponse(200);
+      const expireDate = new Date(2021, 3, 1, 10, 10, 10);
+      httpResponse.addCookie("signedIn", "true", {
+        httpOnly: true,
+        sameSite: "None",
+        maxAge: 150,
+        expires: expireDate,
+        domain: "example.org",
+        path: "/customers",
+        secure: true,
+      });
+      const builtResponse = buildResponse(httpResponse);
+
+      const expectedResponse =
+        `HTTP/1.1 200 OK\r\n` +
+        `Server: ts-webserver\r\n` +
+        `Content-Length: 0\r\n` +
+        `Set-Cookie: signedIn=true; HttpOnly; SameSite=None; Max-Age=150; Expires=${expireDate.toUTCString()}; Domain=example.org; Path=/customers; Secure\r\n` +
+        `\r\n`;
+      expect(builtResponse).toBe(expectedResponse);
+    });
+  });
+
+  test("build complex response", () => {
+    const httpResponse = new HttpResponse(200, "response body");
+    const expireDate = new Date(2021, 3, 1, 10, 10, 10);
+    httpResponse.addCookie("signedIn", "true", {
+      httpOnly: true,
+      sameSite: "None",
+      maxAge: 150,
+      expires: expireDate,
+      domain: "example.org",
+      path: "/customers",
+      secure: true,
+    });
+    httpResponse.addCookie("otherCookie", "value");
+    httpResponse.addHeader("testHeader", "header value");
+    httpResponse.addHeader("X-Correlation-Id", "123");
+    const builtResponse = buildResponse(httpResponse);
+
+    const expectedResponse =
+      `HTTP/1.1 200 OK\r\n` +
+      `Server: ts-webserver\r\n` +
+      `Content-Length: 13\r\n` +
+      `testHeader: header value\r\n` +
+      `X-Correlation-Id: 123\r\n` +
+      `Set-Cookie: signedIn=true; HttpOnly; SameSite=None; Max-Age=150; Expires=${expireDate.toUTCString()}; Domain=example.org; Path=/customers; Secure\r\n` +
+      `Set-Cookie: otherCookie=value\r\n` +
+      `\r\n` +
+      `response body\r\n`;
+    expect(builtResponse).toBe(expectedResponse);
   });
 });

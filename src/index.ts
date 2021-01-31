@@ -12,7 +12,16 @@ webserver.start(8088, (request) => {
   });
 
   let response = new HttpResponse(200, responseBody);
-  response.addCookie("test", "value");
+  const expireDate = new Date(2021, 3, 1, 10, 10, 10);
+  response.addCookie("signedIn", "true", {
+    httpOnly: true,
+    sameSite: "None",
+    maxAge: 150000,
+    expires: expireDate,
+    domain: "localhost",
+    path: "/customers",
+    secure: true,
+  });
 
   return response;
 });

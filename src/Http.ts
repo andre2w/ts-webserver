@@ -26,6 +26,7 @@ export interface CookieAttributes {
   path?: string;
   secure?: boolean;
   httpOnly?: boolean;
+  sameSite?: "Strict" | "Lax" | "None";
 }
 
 export type Cookie = CookieAttributes & {
