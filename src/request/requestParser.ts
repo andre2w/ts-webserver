@@ -1,4 +1,4 @@
-import { HttpRequest, HttpRequestLine, InvalidRequestError } from "../Http";
+import { HttpRequest, InvalidRequestError } from "../Http";
 import { parseCookies } from "./parseCookies";
 import { parseHeaders } from "./parseHeaders";
 
@@ -10,19 +10,38 @@ export function parseRequest(request: string): HttpRequest {
   let cookies = parseCookies(splitRequest);
   let headers = parseHeaders(splitRequest);
 
-  return new HttpRequest(httpRequestLine, headers, cookies);
+  return new HttpRequest(
+    httpRequestLine,
+    headers,
+    cookies,
+    httpRequestLine.queryParameters
+  );
 }
 
-function parseRequestLine(line: string): HttpRequestLine {
+function parseRequestLine(line: string) {
   let [method, uri, version] = line.split(" ");
 
   if (method === undefined || uri === undefined || version === undefined) {
     throw new InvalidRequestError();
   }
 
+  let paramDelimiter = uri.indexOf("?");
+  let queryParameters = new Map<string, string>();
+
+  if (paramDelimiter >= 0) {
+    let params = uri.substr(paramDelimiter + 1);
+    uri = uri.substring(0, paramDelimiter);
+
+    params
+      .split("&")
+      .map((param) => param.split("="))
+      .forEach((param) => queryParameters.set(param[0]!, param[1]!));
+  }
+
   return {
     method,
     uri,
     version,
+    queryParameters,
   };
 }

@@ -12,7 +12,7 @@ describe("Parsing an http GET request", () => {
       `Accept-Encoding: gzip, deflate\r\n` +
       `Connection: keep-alive\r\n` +
       `Cookie: aCookie=withValue; otherCookie=withAnotherValue\r\n` +
-      `Upgrade-Insecure-Requests: 1\r\n`;
+      `Upgrade-Insecure-Requests: 1\r\n\r\n`;
 
     let httpRequest: HttpRequest = parseRequest(request);
     let expectedRequest = new HttpRequest({
@@ -45,7 +45,7 @@ describe("Parsing an http GET request", () => {
       const request =
         `${line}\r\n` +
         `Host: localhost:8088\r\n` +
-        `Upgrade-Insecure-Requests: 1\r\n`;
+        `Upgrade-Insecure-Requests: 1\r\n\r\n`;
 
       expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
     }
@@ -55,7 +55,7 @@ describe("Parsing an http GET request", () => {
     const request =
       `GET / HTTP/1.1 otherInformation\r\n` +
       `Host: localhost:8088\r\n` +
-      `Upgrade-Insecure-Requests: 1\r\n`;
+      `Upgrade-Insecure-Requests: 1\r\n\r\n`;
 
     const expectedRequest = new HttpRequest({
       method: "GET",
@@ -74,9 +74,23 @@ describe("Parsing an http GET request", () => {
       const request =
         `GET / HTTP/1.1 otherInformation\r\n` +
         `Host: localhost:8088\r\n` +
-        `${header}\r\n`;
+        `${header}\r\n\r\n`;
 
       expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
     }
   );
+
+  test("should allow to parse all query parameters", () => {
+    const request = `GET /query?id=123&test=value HTTP/1.1\r\nHost: localhost:8088\r\n\r\n`;
+
+    const expectedRequest = new HttpRequest({
+      method: "GET",
+      uri: "/query",
+      version: "HTTP/1.1",
+    });
+    expectedRequest.addParam("id", "123");
+    expectedRequest.addParam("test", "value");
+    expectedRequest.addHeader("Host", "localhost:8088");
+    expect(parseRequest(request)).toStrictEqual(expectedRequest);
+  });
 });

@@ -239,4 +239,20 @@ describe("Building an HTTP response", () => {
       `response body\r\n`;
     expect(builtResponse).toBe(expectedResponse);
   });
+
+  test("build response with json body", () => {
+    const responseBody = JSON.stringify({
+      id: 123,
+      test: "value",
+      otherField: "otherValue",
+    });
+    const httpResponse = new HttpResponse(200, responseBody);
+
+    const expectedResponse =
+      `HTTP/1.1 200 OK\r\n` +
+      `Server: ts-webserver\r\n` +
+      `Content-Length: ${responseBody.length}\r\n\r\n` +
+      `${responseBody}\r\n`;
+    expect(buildResponse(httpResponse)).toBe(expectedResponse);
+  });
 });

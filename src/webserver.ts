@@ -12,7 +12,6 @@ export default class Webserver {
 
     this.server.on("connection", (conn) => {
       conn.on("data", (data) => {
-        console.log(`data ${data.toString()}`);
         let response: string;
         try {
           const httpRequest = parseRequest(data.toString());

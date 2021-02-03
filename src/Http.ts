@@ -18,17 +18,20 @@ export class HttpRequest {
   readonly version: string;
   readonly headers: Map<string, string>;
   readonly cookies: Map<string, string>;
+  readonly params: Map<string, string>;
 
   constructor(
     requestLine: HttpRequestLine,
     headers: Map<string, string> = new Map(),
-    cookies: Map<string, string> = new Map()
+    cookies: Map<string, string> = new Map(),
+    params: Map<string, string> = new Map()
   ) {
     this.method = requestLine.method;
     this.uri = requestLine.uri;
     this.version = requestLine.version;
     this.headers = headers;
     this.cookies = cookies;
+    this.params = params;
   }
 
   addHeader(name: string, value: string): void {
@@ -37,6 +40,10 @@ export class HttpRequest {
 
   addCookie(name: string, value: string): void {
     this.cookies.set(name, value);
+  }
+
+  addParam(name: string, value: string): void {
+    this.params.set(name, value);
   }
 }
 
