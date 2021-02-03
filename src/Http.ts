@@ -16,13 +16,19 @@ export class HttpRequest {
   readonly method: string;
   readonly uri: string;
   readonly version: string;
-  readonly headers: Map<string, string> = new Map();
-  readonly cookies: Map<string, string> = new Map();
+  readonly headers: Map<string, string>;
+  readonly cookies: Map<string, string>;
 
-  constructor(requestLine: HttpRequestLine) {
+  constructor(
+    requestLine: HttpRequestLine,
+    headers: Map<string, string> = new Map(),
+    cookies: Map<string, string> = new Map()
+  ) {
     this.method = requestLine.method;
     this.uri = requestLine.uri;
     this.version = requestLine.version;
+    this.headers = headers;
+    this.cookies = cookies;
   }
 
   addHeader(name: string, value: string): void {

@@ -1,17 +1,20 @@
-import { Headers, InvalidRequestError } from "../Http";
+import { InvalidRequestError } from "../Http";
+import { MapBuilder } from "../MapBuilder";
 
 interface Header {
   key: string;
   value: string;
 }
 
-export function parseHeaders(requestHeaders: string[]): Headers {
-  let headers: Headers = {};
-  requestHeaders
+export function parseHeaders(requestHeaders: string[]): Map<string, string> {
+  return requestHeaders
     .filter(filterHeaders)
     .map(parseHeader)
-    .forEach((header) => (headers[header.key] = header.value));
-  return headers;
+    .reduce(
+      (headers, header) => headers.add(header.key, header.value),
+      new MapBuilder<string, string>()
+    )
+    .build();
 }
 
 const parseHeader: (header: string) => Header = (header) => {

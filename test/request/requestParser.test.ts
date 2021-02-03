@@ -1,5 +1,5 @@
 import { parseRequest } from "../../src/request/requestParser";
-import { HttpRequestClass, InvalidRequestError } from "../../src/Http";
+import { HttpRequest, InvalidRequestError } from "../../src/Http";
 
 describe("Parsing an http GET request", () => {
   test("the parsed request should contain request line and headers", () => {
@@ -14,8 +14,8 @@ describe("Parsing an http GET request", () => {
       `Cookie: aCookie=withValue; otherCookie=withAnotherValue\r\n` +
       `Upgrade-Insecure-Requests: 1\r\n`;
 
-    let httpRequest: HttpRequestClass = parseRequest(request);
-    let expectedRequest = new HttpRequestClass({
+    let httpRequest: HttpRequest = parseRequest(request);
+    let expectedRequest = new HttpRequest({
       method: "GET",
       uri: "/",
       version: "HTTP/1.1",
@@ -57,7 +57,7 @@ describe("Parsing an http GET request", () => {
       `Host: localhost:8088\r\n` +
       `Upgrade-Insecure-Requests: 1\r\n`;
 
-    const expectedRequest = new HttpRequestClass({
+    const expectedRequest = new HttpRequest({
       method: "GET",
       uri: "/",
       version: "HTTP/1.1",

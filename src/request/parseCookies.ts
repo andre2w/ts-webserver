@@ -1,22 +1,23 @@
-import { Cookies } from "../Http";
+import { MapBuilder } from "../MapBuilder";
 
-export function parseCookies(requestHeaders: string[]): Cookies {
+export function parseCookies(requestHeaders: string[]): Map<string, string> {
   let cookieHeader = requestHeaders
     .find((header) => header.startsWith("Cookie"))
     ?.substr(8);
 
-  let cookies: Cookies = {};
   if (cookieHeader === undefined) {
-    return cookies;
+    return new Map();
   }
 
-  cookieHeader
+  return cookieHeader
     .split(";")
     .map((cookie) => {
       const splitCookie = cookie.split("=");
-      return { key: splitCookie[0]!, value: splitCookie[1]! };
+      return { key: splitCookie[0]!.trim(), value: splitCookie[1]!.trim() };
     })
-    .forEach((cookie) => (cookies[cookie.key.trim()] = cookie.value.trim()));
-
-  return cookies;
+    .reduce(
+      (cookies, cookie) => cookies.add(cookie.key, cookie.value),
+      new MapBuilder<string, string>()
+    )
+    .build();
 }
