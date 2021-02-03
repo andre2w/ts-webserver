@@ -35,7 +35,12 @@ function parseRequestLine(line: string) {
     params
       .split("&")
       .map((param) => param.split("="))
-      .forEach((param) => queryParameters.set(param[0]!, param[1]!));
+      .forEach((param) => {
+        if (param[0] === undefined || param[1] === undefined) {
+          throw new InvalidRequestError();
+        }
+        queryParameters.set(param[0], param[1]);
+      });
   }
 
   return {

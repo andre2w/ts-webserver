@@ -80,17 +80,37 @@ describe("Parsing an http GET request", () => {
     }
   );
 
-  test("should allow to parse all query parameters", () => {
-    const request = `GET /query?id=123&test=value HTTP/1.1\r\nHost: localhost:8088\r\n\r\n`;
+  test.each([
+    { values: [{ key: "id", value: "123" }] },
+    {
+      values: [
+        { key: "id", value: "123" },
+        { key: "test", value: "value" },
+      ],
+    },
+  ])("should allow to parse all query parameters", (params) => {
+    const query = params.values
+      .map((param) => `${param.key}=${param.value}`)
+      .join("&");
+
+    const request = `GET /query?${query} HTTP/1.1\r\nHost: localhost:8088\r\n\r\n`;
 
     const expectedRequest = new HttpRequest({
       method: "GET",
       uri: "/query",
       version: "HTTP/1.1",
     });
-    expectedRequest.addParam("id", "123");
-    expectedRequest.addParam("test", "value");
+    params.values.forEach((param) =>
+      expectedRequest.addParam(param.key, param.value)
+    );
+
     expectedRequest.addHeader("Host", "localhost:8088");
     expect(parseRequest(request)).toStrictEqual(expectedRequest);
+  });
+
+  test("should throw exception when query parameter is invalid", () => {
+    const request = `GET /query?id123&test=value HTTP/1.1\r\nHost: localhost:8088\r\n\r\n`;
+
+    expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
   });
 });
