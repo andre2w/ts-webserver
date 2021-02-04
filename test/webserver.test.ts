@@ -41,13 +41,13 @@ describe("A webserver", () => {
   });
 
   test("Parse request parameters", async () => {
-    const params = { params: { id: 123, test: "value" } };
+    const params = { params: { id: 123, test: "value#@!" } };
     const response = await axios.get<string>(
       `http://localhost:${port}/query`,
       params
     );
 
-    expect(response.data).toStrictEqual({ id: "123", test: "value" });
+    expect(response.data).toStrictEqual({ id: "123", test: "value#@!" });
   });
 
   afterAll(() => {

@@ -1,11 +1,14 @@
 import { Cookie, HttpResponse } from "../Http";
 import StringJoiner from "../StringJoiner";
+import { codeToMessage } from "./codeToMessage";
 
 const lineBreak = "\r\n";
 
 export function buildResponse(httpResponse: HttpResponse): string {
   const response = new StringJoiner(lineBreak, { suffix: lineBreak });
-  response.add(`HTTP/1.1 ${httpResponse.code} OK`);
+  response.add(
+    `HTTP/1.1 ${httpResponse.code} ${codeToMessage(httpResponse.code)}`
+  );
   response.add("Server: ts-webserver");
   response.add(`Content-Length: ${httpResponse.bodyLength()}`);
 

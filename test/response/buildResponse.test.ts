@@ -255,4 +255,14 @@ describe("Building an HTTP response", () => {
       `${responseBody}\r\n`;
     expect(buildResponse(httpResponse)).toBe(expectedResponse);
   });
+
+  test("should contain correct http code name", () => {
+    const httpResponse = new HttpResponse(400);
+
+    const expectedResponse =
+      `HTTP/1.1 400 Bad Request\r\n` +
+      `Server: ts-webserver\r\n` +
+      `Content-Length: 0\r\n\r\n`;
+    expect(buildResponse(httpResponse)).toBe(expectedResponse);
+  });
 });

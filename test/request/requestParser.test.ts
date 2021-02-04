@@ -113,4 +113,22 @@ describe("Parsing an http GET request", () => {
 
     expect(() => parseRequest(request)).toThrowError(InvalidRequestError);
   });
+
+  test("should parse query parameters decoding values", () => {
+    const request =
+      `GET /query?id=123&other=value%3D%40%24 HTTP/1.1\r\n` +
+      `Host: localhost:8088\r\n\r\n`;
+
+    const parsedRequest = parseRequest(request);
+    const expectedRequest = new HttpRequest({
+      method: "GET",
+      uri: "/query",
+      version: "HTTP/1.1",
+    });
+    expectedRequest.addParam("id", "123");
+    expectedRequest.addParam("other", "value=@$");
+    expectedRequest.addHeader("Host", "localhost:8088");
+
+    expect(parsedRequest).toStrictEqual(expectedRequest);
+  });
 });

@@ -54,7 +54,7 @@ function parseParameters(uri: string) {
       if (param[0] === undefined || param[1] === undefined) {
         throw new InvalidRequestError();
       }
-      queryParameters.set(param[0], param[1]);
+      queryParameters.set(param[0], decodeURIComponent(param[1]));
     });
 
   return { queryParameters, uri };
