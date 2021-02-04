@@ -25,23 +25,8 @@ function parseRequestLine(line: string) {
     throw new InvalidRequestError();
   }
 
-  let paramDelimiter = uri.indexOf("?");
-  let queryParameters = new Map<string, string>();
-
-  if (paramDelimiter >= 0) {
-    let params = uri.substr(paramDelimiter + 1);
-    uri = uri.substring(0, paramDelimiter);
-
-    params
-      .split("&")
-      .map((param) => param.split("="))
-      .forEach((param) => {
-        if (param[0] === undefined || param[1] === undefined) {
-          throw new InvalidRequestError();
-        }
-        queryParameters.set(param[0], param[1]);
-      });
-  }
+  let queryParameters;
+  ({ queryParameters, uri } = parseParameters(uri));
 
   return {
     method,
@@ -49,4 +34,28 @@ function parseRequestLine(line: string) {
     version,
     queryParameters,
   };
+}
+
+function parseParameters(uri: string) {
+  let paramDelimiter = uri.indexOf("?");
+  let queryParameters = new Map<string, string>();
+
+  if (paramDelimiter < 0) {
+    return { queryParameters: new Map(), uri };
+  }
+
+  let params = uri.substr(paramDelimiter + 1);
+  uri = uri.substring(0, paramDelimiter);
+
+  params
+    .split("&")
+    .map((param) => param.split("="))
+    .forEach((param) => {
+      if (param[0] === undefined || param[1] === undefined) {
+        throw new InvalidRequestError();
+      }
+      queryParameters.set(param[0], param[1]);
+    });
+
+  return { queryParameters, uri };
 }

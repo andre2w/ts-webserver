@@ -11,9 +11,9 @@ export function parseCookies(requestHeaders: string[]): Map<string, string> {
 
   return cookieHeader
     .split(";")
+    .map((cookie) => cookie.split("="))
     .map((cookie) => {
-      const splitCookie = cookie.split("=");
-      return { key: splitCookie[0]!.trim(), value: splitCookie[1]!.trim() };
+      return { key: cookie[0]!.trim(), value: cookie[1]!.trim() };
     })
     .reduce(
       (cookies, cookie) => cookies.add(cookie.key, cookie.value),

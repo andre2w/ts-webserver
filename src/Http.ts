@@ -1,11 +1,3 @@
-export interface Headers {
-  [name: string]: string;
-}
-
-export interface Cookies {
-  [name: string]: string;
-}
-
 export interface HttpRequestLine {
   method: string;
   uri: string;
@@ -96,6 +88,6 @@ export class HttpResponse {
   }
 
   bodyLength(): number {
-    return this.body?.length || 0;
+    return this.body?.length ?? 0;
   }
 }
