@@ -8,12 +8,14 @@ export class HttpRequest {
   readonly method: string;
   readonly uri: string;
   readonly version: string;
+  readonly body?: string;
   readonly headers: Map<string, string>;
   readonly cookies: Map<string, string>;
   readonly params: Map<string, string>;
 
   constructor(
     requestLine: HttpRequestLine,
+    body?: string,
     headers: Map<string, string> = new Map(),
     cookies: Map<string, string> = new Map(),
     params: Map<string, string> = new Map()
@@ -24,6 +26,7 @@ export class HttpRequest {
     this.headers = headers;
     this.cookies = cookies;
     this.params = params;
+    this.body = body;
   }
 
   addHeader(name: string, value: string): void {

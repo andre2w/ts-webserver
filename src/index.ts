@@ -1,8 +1,16 @@
 import Webserver from "./webserver";
-import { HttpResponse } from "./Http";
+import { HttpRequest, HttpResponse } from "./Http";
 
 const webserver = new Webserver();
 webserver.start(8088, (request) => {
+  if (request.method === "POST") {
+    return postRequest(request);
+  } else {
+    return getRequest(request);
+  }
+});
+
+function getRequest(request: HttpRequest) {
   const responseBody = JSON.stringify({
     field: request.version,
     otherField: "otherValue",
@@ -24,4 +32,8 @@ webserver.start(8088, (request) => {
   });
 
   return response;
-});
+}
+
+function postRequest(request: HttpRequest) {
+  return new HttpResponse(201, request.body);
+}

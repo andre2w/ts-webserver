@@ -17,6 +17,8 @@ describe("A webserver", () => {
         });
         JSON.parse(response);
         return new HttpResponse(200, response);
+      } else if (request.uri === "/post") {
+        return new HttpResponse(200, request.body);
       } else {
         throw new InvalidRequestError();
       }
@@ -48,6 +50,17 @@ describe("A webserver", () => {
     );
 
     expect(response.data).toStrictEqual({ id: "123", test: "value#@!" });
+  });
+
+  test("POST request with JSON body", async () => {
+    const body = {
+      id: 123,
+      field: "value",
+      otherField: "otherValue",
+    };
+    const response = await axios.post(`http://localhost:${port}/post`, body);
+
+    expect(response.data).toStrictEqual(body);
   });
 
   afterAll(() => {

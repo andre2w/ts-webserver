@@ -3,15 +3,18 @@ import { parseCookies } from "./parseCookies";
 import { parseHeaders } from "./parseHeaders";
 
 export function parseRequest(request: string): HttpRequest {
-  const splitRequest = request.split("\r\n")!;
+  const splitRequest = request.split("\r\n\r\n")!;
+  const head = splitRequest[0]!.split("\r\n");
+  const body = splitRequest[1] === "" ? undefined : splitRequest[1]?.trim();
 
-  let httpInfo = splitRequest.shift()!;
+  let httpInfo = head.shift()!;
   let httpRequestLine = parseRequestLine(httpInfo);
-  let cookies = parseCookies(splitRequest);
-  let headers = parseHeaders(splitRequest);
+  let cookies = parseCookies(head);
+  let headers = parseHeaders(head);
 
   return new HttpRequest(
     httpRequestLine,
+    body,
     headers,
     cookies,
     httpRequestLine.queryParameters
