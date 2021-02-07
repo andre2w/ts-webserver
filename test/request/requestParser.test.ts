@@ -1,5 +1,5 @@
 import { parseRequest } from "../../src/request/requestParser";
-import { HttpRequest, InvalidRequestError } from "../../src/Http";
+import { HttpRequest, InvalidRequestError } from "../../src/http";
 
 describe("Parsing an http GET request", () => {
   test("the parsed request should contain request line and headers", () => {

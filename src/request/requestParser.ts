@@ -1,4 +1,4 @@
-import { HttpRequest, InvalidRequestError } from "../Http";
+import { HttpRequest, InvalidRequestError } from "../http";
 import { parseCookies } from "./parseCookies";
 import { parseHeaders } from "./parseHeaders";
 

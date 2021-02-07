@@ -1,6 +1,6 @@
 import Webserver from "../src/webserver";
 import axios from "axios";
-import { HttpResponse, InvalidRequestError } from "../src/Http";
+import { HttpResponse, InvalidRequestError } from "../src/http";
 
 describe("A webserver", () => {
   const webserver = new Webserver();

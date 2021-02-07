@@ -1,4 +1,4 @@
-import StringJoiner from "../src/StringJoiner";
+import StringJoiner from "../src/utils/StringJoiner";
 
 describe("StringJoiner", () => {
   test("join added strings with specified delimiter", () => {

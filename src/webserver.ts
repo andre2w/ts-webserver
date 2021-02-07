@@ -1,7 +1,7 @@
 import * as net from "net";
 import { parseRequest } from "./request/requestParser";
 import { buildResponse } from "./response/buildResponse";
-import { HttpRequest, HttpResponse } from "./Http";
+import { HttpRequest, HttpResponse } from "./http";
 
 export default class Webserver {
   private server?: net.Server;

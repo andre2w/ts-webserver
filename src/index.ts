@@ -1,5 +1,5 @@
 import Webserver from "./webserver";
-import { HttpRequest, HttpResponse } from "./Http";
+import { HttpRequest, HttpResponse } from "./http";
 
 const webserver = new Webserver();
 webserver.start(8088, (request) => {

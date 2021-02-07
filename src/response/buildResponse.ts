@@ -1,5 +1,5 @@
-import { Cookie, HttpResponse } from "../Http";
-import StringJoiner from "../StringJoiner";
+import { Cookie, HttpResponse } from "../http";
+import StringJoiner from "../utils/StringJoiner";
 import { codeToMessage } from "./codeToMessage";
 
 const lineBreak = "\r\n";

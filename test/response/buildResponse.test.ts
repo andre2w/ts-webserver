@@ -1,5 +1,5 @@
 import { buildResponse } from "../../src/response/buildResponse";
-import { HttpResponse } from "../../src/Http";
+import { HttpResponse } from "../../src/http";
 
 describe("Building an HTTP response", () => {
   test("building basic response with body", () => {

@@ -1,5 +1,5 @@
-import { InvalidRequestError } from "../Http";
-import { MapBuilder } from "../MapBuilder";
+import { InvalidRequestError } from "../http";
+import { MapBuilder } from "../utils/MapBuilder";
 
 interface Header {
   key: string;
@@ -17,7 +17,7 @@ export function parseHeaders(requestHeaders: string[]): Map<string, string> {
     .build();
 }
 
-const parseHeader: (header: string) => Header = (header) => {
+function parseHeader(header: string): Header {
   const delimiterIndex = header.indexOf(":");
 
   if (delimiterIndex <= 0) {
@@ -27,8 +27,8 @@ const parseHeader: (header: string) => Header = (header) => {
   const key = header.substring(0, delimiterIndex);
   const value = header.substring(delimiterIndex + 1);
   return { key: key, value: value.trim() };
-};
+}
 
-const filterHeaders: (header: string) => boolean = (header) => {
+function filterHeaders(header: string): boolean {
   return !header.startsWith("Cookie") && header.trim() !== "";
-};
+}

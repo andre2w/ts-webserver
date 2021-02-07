@@ -1,4 +1,4 @@
-import { MapBuilder } from "../MapBuilder";
+import { MapBuilder } from "../utils/MapBuilder";
 
 export function parseCookies(requestHeaders: string[]): Map<string, string> {
   let cookieHeader = requestHeaders
