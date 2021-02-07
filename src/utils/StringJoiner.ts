@@ -11,8 +11,8 @@ export default class StringJoiner {
   }
 
   toString(): string {
-    let preffix = this.options.preffix || "";
-    let suffix = this.options.suffix || "";
+    const preffix = this.options.preffix || "";
+    const suffix = this.options.suffix || "";
     return `${preffix}${this.lines.join(this.separator)}${suffix}`;
   }
 }

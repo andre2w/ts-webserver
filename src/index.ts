@@ -19,7 +19,7 @@ function getRequest(request: HttpRequest) {
     throwABoolean: true,
   });
 
-  let response = new HttpResponse(200, responseBody);
+  const response = new HttpResponse(200, responseBody);
   const expireDate = new Date(2021, 3, 1, 10, 10, 10);
   response.addCookie("signedIn", "true", {
     httpOnly: true,

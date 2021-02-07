@@ -1,64 +1,85 @@
 import { HttpRequest, InvalidRequestError } from "../http";
 import { parseCookies } from "./parseCookies";
 import { parseHeaders } from "./parseHeaders";
+import { MapBuilder } from "../utils/MapBuilder";
+
+const lineBreak = "\r\n";
 
 export function parseRequest(request: string): HttpRequest {
-  const splitRequest = request.split("\r\n\r\n")!;
-  const head = splitRequest[0]!.split("\r\n");
+  // Split the headers from the body
+  const splitRequest = request.split(`${lineBreak}${lineBreak}`);
+  const head = splitRequest[0]?.split(lineBreak) ?? [];
   const body = splitRequest[1] === "" ? undefined : splitRequest[1]?.trim();
+  const httpInfo = head.shift();
 
-  let httpInfo = head.shift()!;
-  let httpRequestLine = parseRequestLine(httpInfo);
-  let cookies = parseCookies(head);
-  let headers = parseHeaders(head);
+  if (httpInfo === undefined) {
+    throw new InvalidRequestError();
+  }
+
+  const httpRequestLine = parseRequestLine(httpInfo);
+  const cookies = parseCookies(head);
+  const headers = parseHeaders(head);
 
   return new HttpRequest(
     httpRequestLine,
     body,
     headers,
     cookies,
-    httpRequestLine.queryParameters
+    httpRequestLine.params
   );
 }
 
 function parseRequestLine(line: string) {
-  let [method, uri, version] = line.split(" ");
+  const [method, uri, version] = line.split(" ");
 
   if (method === undefined || uri === undefined || version === undefined) {
     throw new InvalidRequestError();
   }
 
-  let queryParameters;
-  ({ queryParameters, uri } = parseParameters(uri));
+  const parsedURI = parseParameters(uri);
 
   return {
     method,
-    uri,
     version,
-    queryParameters,
+    uri: parsedURI.uri,
+    params: parsedURI.params,
   };
 }
 
-function parseParameters(uri: string) {
-  let paramDelimiter = uri.indexOf("?");
-  let queryParameters = new Map<string, string>();
+function parseParameters(
+  uri: string
+): { uri: string; params: Map<string, string> } {
+  const paramDelimiter = uri.indexOf("?");
 
   if (paramDelimiter < 0) {
-    return { queryParameters: new Map(), uri };
+    return { uri, params: new Map() };
   }
 
-  let params = uri.substr(paramDelimiter + 1);
+  const params = uri.substr(paramDelimiter + 1);
   uri = uri.substring(0, paramDelimiter);
 
-  params
+  const queryParameters = params
     .split("&")
     .map((param) => param.split("="))
-    .forEach((param) => {
-      if (param[0] === undefined || param[1] === undefined) {
-        throw new InvalidRequestError();
-      }
-      queryParameters.set(param[0], decodeURIComponent(param[1]));
-    });
+    .map((param) => getParam(param))
+    .reduce(
+      (builder, param) =>
+        builder.add(param.key, decodeURIComponent(param.value)),
+      new MapBuilder<string, string>()
+    )
+    .build();
 
-  return { queryParameters, uri };
+  return {
+    uri,
+    params: queryParameters,
+  };
+}
+
+function getParam(param: string[]): { key: string; value: string } {
+  const key = param[0];
+  const value = param[1];
+  if (key === undefined || value === undefined) {
+    throw new InvalidRequestError();
+  }
+  return { key, value };
 }

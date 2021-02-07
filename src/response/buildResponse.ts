@@ -31,8 +31,8 @@ export function buildResponse(httpResponse: HttpResponse): string {
 }
 
 function buildHeaders(httpResponse: HttpResponse): string[] {
-  let result = [];
-  for (let header of httpResponse.headers.entries()) {
+  const result = [];
+  for (const header of httpResponse.headers.entries()) {
     result.push(`${header[0]}: ${header[1]}`);
   }
   return result;
@@ -49,7 +49,7 @@ const attributeNames = new Map([
 ]);
 
 function buildCookies(httpResponse: HttpResponse): string[] {
-  let result: string[] = [];
+  const result: string[] = [];
   httpResponse.cookies.forEach((attributtes, name) =>
     result.push(buildCookie(name, attributtes))
   );

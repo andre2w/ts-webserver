@@ -6,7 +6,10 @@ import { HttpRequest, HttpResponse } from "./http";
 export default class Webserver {
   private server?: net.Server;
 
-  start(port: number, requestHandler: (request: HttpRequest) => HttpResponse) {
+  start(
+    port: number,
+    requestHandler: (request: HttpRequest) => HttpResponse
+  ): void {
     this.server = net.createServer();
     this.server.listen(port);
 
@@ -23,14 +26,10 @@ export default class Webserver {
 
         conn.write(response);
       });
-
-      conn.on("close", () => {});
-
-      conn.on("error", () => {});
     });
   }
 
-  stop() {
+  stop(): void {
     this.server?.close();
   }
 }
