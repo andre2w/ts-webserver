@@ -147,4 +147,20 @@ describe("Parsing an http GET request", () => {
     const httpRequest = parseRequest(request);
     expect(httpRequest.body).toBe(requestBody);
   });
+
+  test("should parse request from form data when the header is present", () => {
+    const request =
+      `POST /post HTTP/1.1\r\n` +
+      `Host: localhost:8088\r\n` +
+      `Content-Type: application/x-www-form-urlencoded\r\n` +
+      `\r\n` +
+      `id=123&other=value%3D%40%24\r\n`;
+
+    const expectedFormData = new Map<string, string>();
+    expectedFormData.set("id", "123");
+    expectedFormData.set("other", "value=@$");
+
+    const httpRequest = parseRequest(request);
+    expect(httpRequest.formData).toStrictEqual(expectedFormData);
+  });
 });

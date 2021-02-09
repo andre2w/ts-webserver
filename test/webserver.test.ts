@@ -2,6 +2,12 @@ import Webserver from "../src/webserver";
 import axios from "axios";
 import { HttpResponse, InvalidRequestError } from "../src/http";
 
+function createFormData(...formData: [string, string][]): string {
+  return formData
+    .map((entry) => `${entry[0]}=${encodeURIComponent(entry[1])}`)
+    .join("&");
+}
+
 describe("A webserver", () => {
   const webserver = new Webserver();
   const port = 8088;
@@ -19,6 +25,16 @@ describe("A webserver", () => {
         return new HttpResponse(200, response);
       } else if (request.uri === "/post") {
         return new HttpResponse(200, request.body);
+      } else if (request.uri === "/post/form") {
+        let responseBody: { [x: string]: string } = {};
+        if (request.formData !== undefined) {
+          for (let data of request.formData) {
+            if (data[0] !== "id") {
+              responseBody[data[0]] = data[1];
+            }
+          }
+        }
+        return new HttpResponse(201, JSON.stringify(responseBody));
       } else {
         throw new InvalidRequestError();
       }
@@ -61,6 +77,25 @@ describe("A webserver", () => {
     const response = await axios.post(`http://localhost:${port}/post`, body);
 
     expect(response.data).toStrictEqual(body);
+  });
+
+  test("POST request with form data", async () => {
+    const body = createFormData(
+      ["id", "123"],
+      ["key", "value"],
+      ["field", "!@#$"]
+    );
+    const response = await axios.post(
+      `http://localhost:${port}/post/form`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    expect(response.data).toStrictEqual({ key: "value", field: "!@#$" });
   });
 
   afterAll(() => {

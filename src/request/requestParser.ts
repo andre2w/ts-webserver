@@ -20,12 +20,24 @@ export function parseRequest(request: string): HttpRequest {
   const cookies = parseCookies(head);
   const headers = parseHeaders(head);
 
+  let formData: Map<string, string> | undefined;
+  for (const header of headers) {
+    if (header[0].toLowerCase() === "content-type") {
+      if (header[1].toLowerCase() === "application/x-www-form-urlencoded") {
+        if (body !== undefined) {
+          formData = parseQuery(body);
+        }
+      }
+    }
+  }
+
   return new HttpRequest(
     httpRequestLine,
     body,
     headers,
     cookies,
-    httpRequestLine.params
+    httpRequestLine.params,
+    formData
   );
 }
 
@@ -58,7 +70,16 @@ function parseParameters(
   const params = uri.substr(paramDelimiter + 1);
   uri = uri.substring(0, paramDelimiter);
 
-  const queryParameters = params
+  const queryParameters = parseQuery(params);
+
+  return {
+    uri,
+    params: queryParameters,
+  };
+}
+
+function parseQuery(params: string) {
+  return params
     .split("&")
     .map((param) => param.split("="))
     .map((param) => getParam(param))
@@ -68,11 +89,6 @@ function parseParameters(
       new MapBuilder<string, string>()
     )
     .build();
-
-  return {
-    uri,
-    params: queryParameters,
-  };
 }
 
 function getParam(param: string[]): { key: string; value: string } {
