@@ -26,7 +26,7 @@ function parseHeader(header: string): Header {
 
   const key = header.substring(0, delimiterIndex);
   const value = header.substring(delimiterIndex + 1);
-  return { key: key, value: value.trim() };
+  return { key: key.toLowerCase(), value: value.trim() };
 }
 
 function filterHeaders(header: string): boolean {

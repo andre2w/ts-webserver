@@ -22,12 +22,8 @@ export function parseRequest(request: string): HttpRequest {
 
   let formData: Map<string, string> | undefined;
   for (const header of headers) {
-    if (header[0].toLowerCase() === "content-type") {
-      if (header[1].toLowerCase() === "application/x-www-form-urlencoded") {
-        if (body !== undefined) {
-          formData = parseQuery(body);
-        }
-      }
+    if (isFormUrlEncoded(header) && body !== undefined) {
+      formData = parseQuery(body);
     }
   }
 
@@ -39,6 +35,13 @@ export function parseRequest(request: string): HttpRequest {
     httpRequestLine.params,
     formData
   );
+}
+
+function isFormUrlEncoded(header: [string, string]): boolean {
+  if (header[0].toLowerCase() !== "content-type") {
+    return false;
+  }
+  return header[1].toLowerCase() === "application/x-www-form-urlencoded";
 }
 
 function parseRequestLine(line: string) {

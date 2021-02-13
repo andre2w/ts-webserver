@@ -20,19 +20,19 @@ describe("Parsing an http GET request", () => {
       uri: "/",
       version: "HTTP/1.1",
     });
-    expectedRequest.addHeader("Host", "localhost:8088");
+    expectedRequest.addHeader("host", "localhost:8088");
     expectedRequest.addHeader(
-      "User-Agent",
+      "user-agent",
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"
     );
     expectedRequest.addHeader(
-      "Accept",
+      "accept",
       "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
     );
-    expectedRequest.addHeader("Accept-Language", "en-GB,en;q=0.5");
-    expectedRequest.addHeader("Accept-Encoding", "gzip, deflate");
-    expectedRequest.addHeader("Connection", "keep-alive");
-    expectedRequest.addHeader("Upgrade-Insecure-Requests", "1");
+    expectedRequest.addHeader("accept-language", "en-GB,en;q=0.5");
+    expectedRequest.addHeader("accept-encoding", "gzip, deflate");
+    expectedRequest.addHeader("connection", "keep-alive");
+    expectedRequest.addHeader("upgrade-insecure-requests", "1");
     expectedRequest.addCookie("aCookie", "withValue");
     expectedRequest.addCookie("otherCookie", "withAnotherValue");
 
@@ -62,8 +62,8 @@ describe("Parsing an http GET request", () => {
       uri: "/",
       version: "HTTP/1.1",
     });
-    expectedRequest.addHeader("Host", "localhost:8088");
-    expectedRequest.addHeader("Upgrade-Insecure-Requests", "1");
+    expectedRequest.addHeader("host", "localhost:8088");
+    expectedRequest.addHeader("upgrade-insecure-requests", "1");
 
     expect(parseRequest(request)).toStrictEqual(expectedRequest);
   });
@@ -104,7 +104,7 @@ describe("Parsing an http GET request", () => {
       expectedRequest.addParam(param.key, param.value)
     );
 
-    expectedRequest.addHeader("Host", "localhost:8088");
+    expectedRequest.addHeader("host", "localhost:8088");
     expect(parseRequest(request)).toStrictEqual(expectedRequest);
   });
 
@@ -127,7 +127,7 @@ describe("Parsing an http GET request", () => {
     });
     expectedRequest.addParam("id", "123");
     expectedRequest.addParam("other", "value=@$");
-    expectedRequest.addHeader("Host", "localhost:8088");
+    expectedRequest.addHeader("host", "localhost:8088");
 
     expect(parsedRequest).toStrictEqual(expectedRequest);
   });
