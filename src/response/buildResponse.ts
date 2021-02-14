@@ -38,7 +38,6 @@ function buildHeaders(httpResponse: HttpResponse): string[] {
   return result;
 }
 
-
 const attributeNames = new Map([
   ["expires", "Expires"],
   ["maxAge", "Max-Age"],
@@ -57,22 +56,25 @@ function buildCookies(httpResponse: HttpResponse): string[] {
   return result;
 }
 
-function buildCookie(name: string, attributtes: Cookie): string {
-  let cookieLine = `Set-Cookie: ${name}=${attributtes.value}`;
+function buildCookie(name: string, attributes: Cookie): string {
+  const cookieLine = new StringJoiner("; ");
+  cookieLine.add(`Set-Cookie: ${name}=${attributes.value}`);
 
-  for (const [attr, value] of Object.entries(attributtes)) {
-    if (!attributeNames.has(attr)) {
+  for (const [attr, value] of Object.entries(attributes)) {
+    const attributeName = attributeNames.get(attr);
+
+    if (attributeName === undefined) {
       continue;
     }
 
     if (attr === "secure" || attr === "httpOnly") {
       if (value === true) {
-        cookieLine += `; ${attributeNames.get(attr)}`;
+        cookieLine.add(attributeName);
       }
     } else {
       const cookieValue = value instanceof Date ? value.toUTCString() : value;
-      cookieLine += `; ${attributeNames.get(attr)}=${cookieValue}`;
+      cookieLine.add(`${attributeName}=${cookieValue}`);
     }
   }
-  return cookieLine;
+  return cookieLine.toString();
 }
