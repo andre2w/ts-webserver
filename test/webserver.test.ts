@@ -1,6 +1,5 @@
-import Webserver from "../src/webserver";
 import axios from "axios";
-import { HttpResponse, InvalidRequestError } from "../src/http";
+import { TestApplication } from "./TestApplication";
 
 function createFormData(...formData: [string, string][]): string {
   return formData
@@ -9,36 +8,11 @@ function createFormData(...formData: [string, string][]): string {
 }
 
 describe("A webserver", () => {
-  const webserver = new Webserver();
+  const testApplication = new TestApplication();
   const port = 8088;
 
   beforeAll(() => {
-    webserver.start(port, (request) => {
-      if (request.uri === "/success") {
-        return new HttpResponse(200, "Request Successful");
-      } else if (request.uri.startsWith("/query")) {
-        const response = JSON.stringify({
-          id: request.params.get("id"),
-          test: request.params.get("test"),
-        });
-        JSON.parse(response);
-        return new HttpResponse(200, response);
-      } else if (request.uri === "/post") {
-        return new HttpResponse(200, request.body);
-      } else if (request.uri === "/post/form") {
-        let responseBody: { [x: string]: string } = {};
-        if (request.formData !== undefined) {
-          for (let data of request.formData) {
-            if (data[0] !== "id") {
-              responseBody[data[0]] = data[1];
-            }
-          }
-        }
-        return new HttpResponse(201, JSON.stringify(responseBody));
-      } else {
-        throw new InvalidRequestError();
-      }
-    });
+    testApplication.start(port);
   });
 
   test("Can receive simple get requests", async () => {
@@ -99,6 +73,6 @@ describe("A webserver", () => {
   });
 
   afterAll(() => {
-    webserver.stop();
+    testApplication.stop();
   });
 });
