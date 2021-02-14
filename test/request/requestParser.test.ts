@@ -14,8 +14,8 @@ describe("Parsing an http GET request", () => {
       `Cookie: aCookie=withValue; otherCookie=withAnotherValue\r\n` +
       `Upgrade-Insecure-Requests: 1\r\n\r\n`;
 
-    let httpRequest: HttpRequest = parseRequest(request);
-    let expectedRequest = new HttpRequest({
+    const httpRequest: HttpRequest = parseRequest(request);
+    const expectedRequest = new HttpRequest({
       method: "GET",
       uri: "/",
       version: "HTTP/1.1",
