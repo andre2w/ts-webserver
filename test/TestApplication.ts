@@ -12,7 +12,9 @@ export class TestApplication {
     this.webserver.stop();
   }
 
-  private handleRequest(request: HttpRequest): HttpResponse {
+  private handleRequest: (request: HttpRequest) => HttpResponse = (
+    request: HttpRequest
+  ) => {
     if (request.uri === "/success") {
       return new HttpResponse(200, "Request Successful");
     } else if (request.uri.startsWith("/query")) {
@@ -36,5 +38,5 @@ export class TestApplication {
     } else {
       throw new InvalidRequestError();
     }
-  }
+  };
 }
